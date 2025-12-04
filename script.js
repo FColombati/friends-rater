@@ -5,7 +5,9 @@ import {
   onSnapshot, updateDoc, increment, query
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-
+/*
+  SOSTITUISCI QUI IL TUO firebaseConfig
+*/
 const firebaseConfig = {
   apiKey: "AIzaSyAqdGC5ACNqRhlBJeFp2ozq8TyLwJAaIEk",
   authDomain: "friends-rater-92639.firebaseapp.com",
@@ -61,6 +63,29 @@ function hideInfo(){
   currentUsernameEl.textContent = '';
 }
 
+/* ---------- Save / Load group in localStorage ---------- */
+function saveGroupLocally() {
+  localStorage.setItem('groupId', currentGroupId);
+  localStorage.setItem('username', currentUsername);
+}
+
+function clearLocalGroup() {
+  localStorage.removeItem('groupId');
+  localStorage.removeItem('username');
+}
+
+/* ---------- Auto-load group on refresh ---------- */
+window.addEventListener("load", () => {
+  const savedGroup = localStorage.getItem('groupId');
+  const savedUser = localStorage.getItem('username');
+
+  if (savedGroup && savedUser) {
+    currentGroupId = savedGroup;
+    currentUsername = savedUser;
+    joinGroup(currentGroupId, currentUsername); // ricarica membri e listener
+  }
+});
+
 /* ---------- Group actions ---------- */
 createGroupBtn.addEventListener('click', async () => {
   const name = usernameInput.value.trim();
@@ -68,9 +93,7 @@ createGroupBtn.addEventListener('click', async () => {
 
   const id = makeId(6);
   const groupRef = doc(db, 'groups', id);
-  await setDoc(groupRef, {
-    createdAt: new Date().toISOString()
-  });
+  await setDoc(groupRef, { createdAt: new Date().toISOString() });
 
   joinGroup(id, name);
 });
@@ -88,13 +111,12 @@ leaveBtn.addEventListener('click', async () => {
 
   // opzionale: segna come left
   const memberRef = doc(db, 'groups', currentGroupId, 'members', currentUsername);
-  try {
-    await updateDoc(memberRef, { leftAt: new Date().toISOString() });
-  } catch(e){}
+  try { await updateDoc(memberRef, { leftAt: new Date().toISOString() }); } catch(e){}
 
   if (membersUnsub) membersUnsub();
   currentGroupId = null;
   currentUsername = null;
+  clearLocalGroup();
   hideInfo();
   membersList.innerHTML = '';
   leaderboard.innerHTML = '';
@@ -104,6 +126,7 @@ leaveBtn.addEventListener('click', async () => {
 async function joinGroup(groupId, username){
   currentGroupId = groupId;
   currentUsername = username;
+  saveGroupLocally();
   showInfo(groupId, username);
 
   const memberRef = doc(db, 'groups', groupId, 'members', username);
@@ -213,7 +236,7 @@ async function voteMember(targetId, delta){
   const eventsRef = collection(db, 'groups', currentGroupId, 'events');
 
   try {
-    // prendo TUTTI gli eventi della giornata per capire se ho già votato quel target oggi
+    // prendo tutti gli eventi della giornata
     const qEvents = query(eventsRef);
     const eventsSnap = await getDocs(qEvents);
 
@@ -233,11 +256,11 @@ async function voteMember(targetId, delta){
       return alert(`Hai già votato ${targetId} oggi. Ritenta domani 👀`);
     }
 
-    // se non ho votato oggi → OK, applico il voto
+    // se non ho votato oggi → applica voto
     const targetRef = doc(db, 'groups', currentGroupId, 'members', targetId);
     await updateDoc(targetRef, { score: increment(delta) });
 
-    // registro evento
+    // registra evento
     await setDoc(doc(eventsRef), {
       by: currentUsername,
       to: targetId,
