@@ -109,7 +109,6 @@ joinGroupBtn.addEventListener('click', () => {
 leaveBtn.addEventListener('click', async () => {
   if (!currentGroupId || !currentUsername) return;
 
-  // opzionale: segna come left
   const memberRef = doc(db, 'groups', currentGroupId, 'members', currentUsername);
   try { await updateDoc(memberRef, { leftAt: new Date().toISOString() }); } catch(e){}
 
@@ -133,6 +132,7 @@ async function joinGroup(groupId, username){
   const snap = await getDoc(memberRef);
 
   if (!snap.exists()) {
+    // Se è un nuovo membro, aggiungilo
     await setDoc(memberRef, {
       name: username,
       score: 0,
@@ -140,7 +140,7 @@ async function joinGroup(groupId, username){
     });
   }
 
-  // listener realtime
+  // Listener realtime dei membri (sempre attivo)
   const membersCol = collection(db, 'groups', groupId, 'members');
   if (membersUnsub) membersUnsub();
   membersUnsub = onSnapshot(membersCol, (snapshot) => {
