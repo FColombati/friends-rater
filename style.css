@@ -70,7 +70,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .score{font-size:13px;color:var(--muted)}
 
 .controls{display:flex;gap:8px}
-.vote-btn{padding:6px 10px;border-radius:6px;border:1px solid #e2e8f0;background:#f7fafc;cursor:pointer}
+.vote-btn{padding:6px 10px;border-radius:6px;border:1px solid #e2e8f0;background:#f7fafc;cursor:pointer;color: black}
 .vote-btn:hover{transform:translateY(-1px)}
 
 .hidden{display:none}
