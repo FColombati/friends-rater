@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gruppo Bonus/Malus — Piscariello</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Bonus / Malus — Gruppi</h1>
+      <p class="muted">Crea un gruppo e votatevi a vicenda con +1 o -1. Classifica aggiornata in tempo reale.</p>
+    </header>
+
+    <section class="panel" id="setup">
+      <h2>1) Crea o entra in un gruppo</h2>
+
+      <div class="row">
+        <div>
+          <label>Nome utente</label>
+          <input id="usernameInput" placeholder="es. Marco92" maxlength="24"/>
+        </div>
+
+        <div>
+          <button id="createGroupBtn">Crea nuovo gruppo</button>
+        </div>
+      </div>
+
+      <div class="row small-gap">
+        <div>
+          <label>ID gruppo (per unirsi)</label>
+          <input id="groupIdInput" placeholder="Inserisci ID gruppo" />
+        </div>
+        <div>
+          <button id="joinGroupBtn">Unisciti al gruppo</button>
+        </div>
+      </div>
+
+      <div id="currentInfo" class="info hidden">
+        <p><strong>Gruppo:</strong> <span id="currentGroupId"></span></p>
+        <p><strong>Tu:</strong> <span id="currentUsername"></span></p>
+        <button id="leaveBtn" class="danger">Abbandona gruppo</button>
+      </div>
+    </section>
+
+    <section class="panel" id="membersPanel" class="hidden">
+      <h2>2) Membri & voti</h2>
+      <div id="membersList" class="members"></div>
+    </section>
+
+    <section class="panel" id="leaderboardPanel">
+      <h2>Classifica (minore = peggiore)</h2>
+      <ol id="leaderboard"></ol>
+    </section>
+
+    <footer>
+      <small>Prototipo - sostituisci <code>firebaseConfig</code> con le tue credenziali Firebase.</small>
+    </footer>
+  </main>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
